@@ -1,0 +1,10 @@
+{
+  "devDependencies": {
+    "concurrently": "^8.2.2"
+  },
+  "scripts": {
+    "server": "npm start server.js --prefix server",
+    "client": "npm start --prefix client",
+    "bibliohome": "concurrently \"npm run server\" \"npm run client\""
+}
+}
