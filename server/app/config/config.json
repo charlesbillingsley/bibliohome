@@ -1,0 +1,9 @@
+{
+  "bibliohome": {
+    "username": "root",
+    "password": "123456",
+    "database": "database_development",
+    "host": "localhost",
+    "dialect": "mysql"
+  }
+}
