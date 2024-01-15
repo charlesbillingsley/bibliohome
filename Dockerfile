@@ -9,11 +9,13 @@ RUN apk add --no-cache \
     npm \
     git
 
-COPY package.json /
-COPY index.js /
-RUN cd / && npm install --unsafe-perm
+RUN cd /server && npm install --unsafe-perm
+RUN cd /client && npm install --unsafe-perm
 
 COPY run.sh /
 RUN chmod a+x /run.sh
 
 CMD [ "/run.sh" ]
+
+EXPOSE 3000
+EXPOSE 3001
