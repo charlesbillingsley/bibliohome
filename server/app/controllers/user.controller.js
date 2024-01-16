@@ -3,7 +3,7 @@ const validator = require("validator");
 const asyncHandler = require("express-async-handler");
 const nodemailer = require("nodemailer");
 const db = require("../models");
-const bcrypt = require("bcrypt");
+const bcrypt = require("bcryptjs");
 const User = db.users;
 
 // Helpers
