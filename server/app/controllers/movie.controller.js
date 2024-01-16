@@ -120,6 +120,8 @@ exports.create = asyncHandler(async (req, res) => {
     await movie.setMovieGenres(collectedGenres.map((genre) => genre.id));
   }
 
+  await movie.setMediaType(2);
+
   res.status(201).json(movie);
 });
 

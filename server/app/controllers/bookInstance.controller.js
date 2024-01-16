@@ -71,6 +71,8 @@ exports.create = asyncHandler(async (req, res) => {
   if (libraryIds) {
     await bookInstance.addLibraries(libraryIds);
   }
+
+  await bookInstance.setMediaType(1);
   
   bookInstance = await BookInstance.findByPk(bookInstance.id, {
     include: [

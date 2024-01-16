@@ -72,6 +72,8 @@ exports.create = asyncHandler(async (req, res) => {
     await movieInstance.addLibraries(libraryIds);
   }
 
+  await movieInstance.setMediaType(2);
+
   movieInstance = await MovieInstance.findByPk(movieInstance.id, {
     include: [
       Library,

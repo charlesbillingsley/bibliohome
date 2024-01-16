@@ -110,6 +110,8 @@ exports.create = asyncHandler(async (req, res) => {
     await book.setBookGenres(collectedGenres.map((genre) => genre.id));
   }
 
+  await book.setMediaType(1);
+
   res.status(201).json(book);
 });
 
