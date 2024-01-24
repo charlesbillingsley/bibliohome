@@ -1,7 +1,7 @@
 const Sequelize = require("sequelize");
 
 module.exports = {
-    HOST: "db",
+    HOST: "localhost",
     USER: "root",
     PASSWORD: "123456",
     DB: "bibliohome",
