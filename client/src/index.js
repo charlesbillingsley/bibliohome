@@ -4,7 +4,11 @@ import App from './App';
 import reportWebVitals from './reportWebVitals';
 import axios from 'axios';
 
-axios.defaults.baseURL = 'http://localhost:3001/api';
+//dev
+//axios.defaults.baseURL = process.env.REACT_APP_API_ENDPOINT;
+
+//prod
+axios.defaults.baseURL = window.location.href + '/api';
 
 const root = ReactDOM.createRoot(document.getElementById('root'));
 root.render(

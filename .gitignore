@@ -13,6 +13,7 @@ server/public/images
 
 # production
 /build
+/client/.env
 
 # misc
 .DS_Store
