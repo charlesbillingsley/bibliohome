@@ -24,7 +24,6 @@
     "react-quill": "^2.0.0",
     "react-scripts": "5.0.1",
     "react-use": "^17.4.0",
-    "react-zxing": "^1.1.4",
     "web-vitals": "^2.1.4"
   },
   "scripts": {

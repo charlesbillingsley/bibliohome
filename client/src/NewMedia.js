@@ -402,6 +402,7 @@ export default function NewMedia(props) {
         ) : null}
         {activeStep === 1 ? (
           <EntryMethod
+            productCode={productCode}
             setProductCode={setProductCode}
             setMediaTitle={setMediaTitle}
             setMediaYear={setMediaYear}

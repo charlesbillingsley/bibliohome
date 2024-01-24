@@ -105,7 +105,10 @@ export default function EntryMethod(props) {
         }}
       >
         {barcodeEntry && (
-          <BarcodeScanner setResult={handleScannedProductCode} />
+          <BarcodeScanner 
+            productCode={props.productCode}
+            setResult={handleScannedProductCode}
+          />
         )}
         {productCodeEntry && (
           <TextField
