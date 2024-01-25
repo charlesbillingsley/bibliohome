@@ -74,7 +74,7 @@ function CardGrid(props) {
         .get("mediaInstance/search", {
           params: {
             libraryId: props.selectedLibrary.id,
-            pageSize: 10,
+            pageSize: 1000,
             page: 1,
           },
         })

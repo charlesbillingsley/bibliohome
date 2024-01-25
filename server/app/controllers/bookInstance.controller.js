@@ -73,12 +73,9 @@ exports.create = asyncHandler(async (req, res) => {
   }
 
   await bookInstance.setMediaType(1);
-  
+
   bookInstance = await BookInstance.findByPk(bookInstance.id, {
-    include: [
-      Library,
-      Book,
-    ]
+    include: [Library, Book],
   });
 
   res.status(201).json(bookInstance);
@@ -156,7 +153,12 @@ exports.search = asyncHandler(async (req, res) => {
 exports.findOne = asyncHandler(async (req, res) => {
   const { id } = req.params;
 
-  const bookInstance = await BookInstance.findByPk(id, { include: Book });
+  const bookInstance = await BookInstance.findByPk(id, {
+    include: [{
+      model: Library,
+      through: { attributes: [] }, // Exclude join table attributes
+    }, Book],
+  });
 
   if (!bookInstance) {
     return res.status(404).json({ error: "Book instance not found" });
@@ -195,7 +197,9 @@ exports.update = asyncHandler(async (req, res) => {
 
   const { status, dueback, bookId, userId, libraryIds } = req.body;
 
-  const bookInstance = await BookInstance.findByPk(id);
+  const bookInstance = await BookInstance.findByPk(id, {
+    include: [Library, Book],
+  });
 
   if (!bookInstance) {
     return res.status(404).json({ error: "Book instance not found" });

@@ -64,6 +64,7 @@ export default function NewMedia(props) {
     setMediaType(null);
     setMediaTypeError("");
     setMediaExists(false);
+    setProductCode("");
   };
 
   const clearAndClose = () => {
@@ -364,9 +365,9 @@ export default function NewMedia(props) {
     };
 
     if (mediaInfo) {
-      if (mediaType == 1) {
+      if (mediaType.id == 1) {
         checkBook();
-      } else if (mediaType == 2) {
+      } else if (mediaType.id == 2) {
         checkMovie();
       }
     }
