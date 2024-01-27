@@ -136,7 +136,7 @@ export default function NewMedia(props) {
           isbn13: isbn13.identifier,
           subtitle: mediaInfo.subtitle,
           description: mediaInfo.description,
-          pageCount: mediaInfo.pageCount,
+          pageCount: mediaInfo.pageCount ? mediaInfo.pageCount : 0,
           publisher: mediaInfo.publisher,
           publishedDate: mediaInfo.publishedDate,
           genres: mediaInfo.categories ? mediaInfo.categories : [],
