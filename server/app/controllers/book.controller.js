@@ -90,18 +90,23 @@ exports.create = asyncHandler(async (req, res) => {
     collectedGenres.push(genre);
   }
 
-  // Create a new book instance
-  const book = await Book.create({
-    title,
-    isbn10,
-    isbn13,
-    subtitle,
-    description,
-    photo,
-    pageCount,
-    publisher,
-    publishedDate,
-  });
+  try {
+    // Create a new book instance
+    const book = await Book.create({
+      title,
+      isbn10,
+      isbn13,
+      subtitle,
+      description,
+      photo,
+      pageCount,
+      publisher,
+      publishedDate,
+    });
+  } catch (e) {
+    console.error(e);
+    throw e;
+  }
 
   if (collectedAuthors.length > 0) {
     await book.setAuthors(collectedAuthors.map((author) => author.id));
