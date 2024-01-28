@@ -144,11 +144,21 @@ export default function MediaQuickInfo(props) {
             if (response.data.totalItems === 0) {
               props.setMediaNotFound(true);
             } else {
-              // Get the real link and call that
-              var selfLink = response.data.items[0].selfLink;
+              // Get matching book
+              let match = response.data.items[0]
+
+              if (props.productCode) {
+                for (var i of response.data.items) {
+                  for (var j of i.volumeInfo.industryIdentifiers) {
+                    if (j.identifier == props.productCode) {
+                      match = i;
+                    }
+                  }
+                }
+              }
 
               axios
-                .get(selfLink) // Call a GET command on the selfLink URL
+                .get(match.selfLink) // Call a GET command on the selfLink URL
                 .then(function (selfLinkResponse) {
                   var foundMediaInfo = selfLinkResponse.data.volumeInfo;
                   props.setMediaInfo(foundMediaInfo);

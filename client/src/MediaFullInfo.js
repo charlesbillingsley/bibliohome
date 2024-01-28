@@ -385,7 +385,7 @@ export default function MediaFullInfo(props) {
                     )}
                   </Box>
                   <Box>
-                    {props.mediaInstance.numberOfCopies ? (
+                    {props.mediaInstance?.numberOfCopies ? (
                       <Typography variant="body">
                         Copies: {props.mediaInstance.numberOfCopies}
                       </Typography>

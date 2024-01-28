@@ -92,9 +92,10 @@ exports.create = asyncHandler(async (req, res) => {
     collectedGenres.push(genre);
   }
 
+  let book;
   try {
     // Create a new book instance
-    const book = await Book.create({
+    book = await Book.create({
       title,
       isbn10,
       isbn13,
