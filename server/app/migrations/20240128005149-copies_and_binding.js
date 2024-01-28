@@ -7,13 +7,13 @@ module.exports = {
     return queryInterface.sequelize.transaction((t) => {
       return Promise.all([
         queryInterface.addColumn(
-          "books",
+          "Books",
           "binding",
           { type: DataTypes.ENUM("", "paperback", "hardcover") },
           { transaction: t }
         ),
         queryInterface.addColumn(
-          "bookInstances",
+          "BookInstances",
           "numberOfCopies",
           { type: Sequelize.INTEGER, defaultValue: 0 },
           { transaction: t }
@@ -25,8 +25,8 @@ module.exports = {
   async down(queryInterface, Sequelize) {
     return queryInterface.sequelize.transaction((t) => {
       return Promise.all([
-        queryInterface.removeColumn("books", "binding", { transaction: t }),
-        queryInterface.removeColumn("bookInstances", "numberOfCopies", {
+        queryInterface.removeColumn("Books", "binding", { transaction: t }),
+        queryInterface.removeColumn("BookInstances", "numberOfCopies", {
           transaction: t,
         }),
       ]);
