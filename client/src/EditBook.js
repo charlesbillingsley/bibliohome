@@ -164,7 +164,7 @@ export default function EditBook(props) {
         label="Date Published"
         sx={{ marginTop: "10px" }}
         value={publishedDate}
-        onChange={(e) => setPublishedDate(e.target.value)}
+        onChange={(e) => setPublishedDate(e)}
       />
 
       <TextField
