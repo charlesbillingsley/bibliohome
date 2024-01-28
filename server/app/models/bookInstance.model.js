@@ -1,8 +1,3 @@
-const db = require('../models');
-const Book = db.books;
-const User = db.users;
-const { DataTypes } = require("sequelize");
-
 module.exports = (sequelize, Sequelize) => {
     const BookInstance = sequelize.define("BookInstance", {
         status: {
@@ -16,7 +11,11 @@ module.exports = (sequelize, Sequelize) => {
         dueBack: {
             type: Sequelize.DATE,
             defaultValue: Sequelize.NOW
-        }
+        },
+        numberOfCopies: {
+          type: Sequelize.INTEGER,
+          defaultValue: '1'
+        },
     });
 
     // Virtual for bookinstance's URL

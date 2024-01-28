@@ -4,7 +4,7 @@ import dayjs from "dayjs";
 import ReactQuill from "react-quill";
 import "react-quill/dist/quill.snow.css";
 import Box from "@mui/material/Box";
-import { Button, FormLabel, TextField } from "@mui/material";
+import { Button, FormLabel, MenuItem, TextField } from "@mui/material";
 import { DatePicker } from "@mui/x-date-pickers/DatePicker";
 import AuthorInput from "./AuthorInput";
 import GenreInput from "./GenreInput";
@@ -20,6 +20,10 @@ export default function EditBook(props) {
     dayjs(props.mediaInfo.publishedDate)
   );
   const [pageCount, setPageCount] = useState(props.mediaInfo.pageCount);
+  const [binding, setBinding] = useState(props.mediaInfo.binding || "");
+  const [numberOfCopies, setNumberOfCopies] = useState(
+    props.mediaInstance.numberOfCopies || 0
+  );
   const [authors, setAuthors] = useState(props.mediaInfo.authors);
   const [genres, setGenres] = useState(props.mediaInfo.bookGenres);
 
@@ -43,13 +47,25 @@ export default function EditBook(props) {
         subtitle,
         description,
         pageCount,
+        binding,
         publisher,
         publishedDate: dayjs(publishedDate).format("YYYY-MM-DD"),
       };
       const updateBookResponse = await axios.post(apiUrl, payload);
-
       if (updateBookResponse.data.id) {
         props.setMediaInfo(updateBookResponse.data);
+      }
+
+      let instanceUrl = "/bookInstance/" + props.mediaInstance.id + "/update";
+      const saveBookInstanceResponse = await axios.post(instanceUrl, {
+        numberOfCopies: numberOfCopies
+      });
+
+      if (saveBookInstanceResponse.data.id) {
+        props.updateMediaInstance(saveBookInstanceResponse.data);
+      }
+      
+      if (updateBookResponse.data.id && saveBookInstanceResponse.data.id) {
         props.closeModal();
       }
     } catch (e) {
@@ -157,6 +173,25 @@ export default function EditBook(props) {
         type="number"
         value={pageCount}
         onChange={(e) => setPageCount(e.target.value)}
+      />
+
+      <TextField
+        sx={{ marginTop: "10px" }}
+        value={binding}
+        label="Binding"
+        select
+        onChange={(e) => setBinding(e.target.value)}
+      >
+        <MenuItem value={"paperback"}>Paperback</MenuItem>
+        <MenuItem value={"hardcover"}>Hardcover</MenuItem>
+      </TextField>
+
+      <TextField
+        label="Number Of Copies"
+        sx={{ marginTop: "10px" }}
+        type="number"
+        value={numberOfCopies}
+        onChange={(e) => setNumberOfCopies(e.target.value)}
       />
 
       <GenreInput initialGenres={genres} onGenresChange={handleGenresChange} />

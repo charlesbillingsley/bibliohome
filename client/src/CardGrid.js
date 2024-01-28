@@ -49,6 +49,25 @@ function CardGrid(props) {
       });
   };
 
+  const updateMediaInstance = (mediaInstance) => {
+    setMediaInstances((prevInstances) => {
+      const index = prevInstances.findIndex(
+        (obj) => obj.id === mediaInstance.id
+      );
+
+      if (index > -1) {
+        const updatedInstances = [
+          ...prevInstances.slice(0, index),
+          mediaInstance,
+          ...prevInstances.slice(index + 1),
+        ];
+        return updatedInstances;
+      }
+
+      return prevInstances;
+    });
+  };
+
   const scrollToSection = (letter) => {
     let currentLetter = letter;
     var sectionElement = document.getElementById(`section-${letter}`);
@@ -127,6 +146,7 @@ function CardGrid(props) {
             mediaTypeId={mediaInstance.mediaTypeId}
             drawerOpen={props.drawerOpen}
             deleteMediaInstance={deleteMediaInstance}
+            updateMediaInstance={updateMediaInstance}
           />
         );
       });

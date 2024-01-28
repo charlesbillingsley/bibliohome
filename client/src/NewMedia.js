@@ -153,6 +153,7 @@ export default function NewMedia(props) {
         bookId: existingBook,
         status: "Maintenance",
         libraryIds: [props.selectedLibrary.id],
+        numberOfCopies: 1
       });
       props.setNewInstance(saveBookInstanceResponse.data);
     } catch (error) {

@@ -1,8 +1,15 @@
 {
-  "bibliohome": {
+  "development": {
     "username": "root",
     "password": "123456",
-    "database": "database_development",
+    "database": "bibliohome",
+    "host": "localhost",
+    "dialect": "mysql"
+  },
+  "production": {
+    "username": "root",
+    "password": "123456",
+    "database": "bibliohome",
     "host": "localhost",
     "dialect": "mysql"
   }

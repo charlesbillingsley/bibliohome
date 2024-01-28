@@ -153,12 +153,22 @@ exports.search = asyncHandler(async (req, res) => {
 exports.findOne = asyncHandler(async (req, res) => {
   const { id } = req.params;
 
-  const bookInstance = await BookInstance.findByPk(id, {
-    include: [{
-      model: Library,
-      through: { attributes: [] }, // Exclude join table attributes
-    }, Book],
-  });
+  let bookInstance;
+
+  try {
+    bookInstance = await BookInstance.findByPk(id, {
+      include: [
+        {
+          model: Library,
+          through: { attributes: [] }, // Exclude join table attributes
+        },
+        Book,
+      ],
+    });
+  } catch (e) {
+    console.error(e);
+    throw e;
+  }
 
   if (!bookInstance) {
     return res.status(404).json({ error: "Book instance not found" });
@@ -172,30 +182,28 @@ exports.update = asyncHandler(async (req, res) => {
   const { id } = req.params;
 
   // Validate request body using express-validator
-  await body("status").notEmpty().withMessage("Status is required").run(req);
+  await body("status").run(req);
   await body("dueback")
     .optional({ nullable: true })
     .isDate()
     .withMessage("Invalid due back date")
     .run(req);
-  await body("bookId").notEmpty().withMessage("Book ID is required").run(req);
-  await body("userId")
-    .optional()
-    .notEmpty()
-    .withMessage("User ID cannot be empty")
-    .run(req);
+  await body("bookId").run(req);
+  await body("userId").optional().run(req);
   await body("libraryIds")
     .optional()
     .isArray()
     .withMessage("Library IDs must be an array")
     .run(req);
+  await body("numberOfCopies").optional().run(req);
 
   const errors = validationResult(req);
   if (!errors.isEmpty()) {
     return res.status(400).json({ errors: errors.array() });
   }
 
-  const { status, dueback, bookId, userId, libraryIds } = req.body;
+  const { status, dueback, bookId, userId, libraryIds, numberOfCopies } =
+    req.body;
 
   const bookInstance = await BookInstance.findByPk(id, {
     include: [Library, Book],
@@ -206,9 +214,11 @@ exports.update = asyncHandler(async (req, res) => {
   }
 
   // Check if the associated book exists
-  const bookExists = await Book.findByPk(bookId);
-  if (!bookExists) {
-    return res.status(400).json({ error: "Invalid Book ID" });
+  if (bookId) {
+    const bookExists = await Book.findByPk(bookId);
+    if (!bookExists) {
+      return res.status(400).json({ error: "Invalid Book ID" });
+    }
   }
 
   // Check if the associated user exists
@@ -230,10 +240,21 @@ exports.update = asyncHandler(async (req, res) => {
   }
 
   // Update the book instance's properties
-  bookInstance.status = status;
-  bookInstance.dueback = dueback;
-  bookInstance.bookId = bookId;
-  bookInstance.userId = userId;
+  if (status) {
+    bookInstance.status = status;
+  }
+  if (dueback) {
+    bookInstance.dueback = dueback;
+  }
+  if (bookId) {
+    bookInstance.bookId = bookId;
+  }
+  if (userId) {
+    bookInstance.userId = userId;
+  }
+  if (numberOfCopies) {
+    bookInstance.numberOfCopies = numberOfCopies;
+  }
 
   await bookInstance.save();
 

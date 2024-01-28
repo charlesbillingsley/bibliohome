@@ -137,10 +137,12 @@ function MediaInstanceCard(props) {
             mediaExists={true}
             mediaInfo={mediaInfo}
             setMediaInfo={setMediaInfo}
+            mediaInstance={props.mediaInstance}
             coverUrl={coverUrl}
             setCoverUrl={setCoverUrl}
             clickable={true}
             deleteMediaInstance={deleteMediaInstance}
+            updateMediaInstance={props.updateMediaInstance}
             user={props.user}
             userStatus={userStatus}
             setUserStatus={setUserStatus}

@@ -384,6 +384,18 @@ export default function MediaFullInfo(props) {
                       </Typography>
                     )}
                   </Box>
+                  <Box>
+                    {props.mediaInstance.numberOfCopies ? (
+                      <Typography variant="body">
+                        Copies: {props.mediaInstance.numberOfCopies}
+                      </Typography>
+                    ) : null}
+                    {props.mediaInfo.binding && (
+                      <Typography variant="body" sx={{ marginLeft: "10px" }}>
+                        Binding: {props.mediaInfo.binding}
+                      </Typography>
+                    )}
+                  </Box>
                   {(props.mediaInfo.isbn10 || props.mediaInfo.isbn13) && (
                     <Box sx={{ display: "flex", flexWrap: "wrap" }}>
                       <Box sx={{ marginRight: "10px" }}>
@@ -557,6 +569,8 @@ export default function MediaFullInfo(props) {
               <EditBook
                 mediaInfo={props.mediaInfo}
                 setMediaInfo={props.setMediaInfo}
+                mediaInstance={props.mediaInstance}
+                updateMediaInstance={props.updateMediaInstance}
                 mediaTypeId={props.mediaTypeId}
                 closeModal={closeEditMedia}
               ></EditBook>

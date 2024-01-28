@@ -1,3 +1,5 @@
+const { DataTypes } = require("sequelize");
+
 module.exports = (sequelize, Sequelize) => {
   const Book = sequelize.define("Book", {
     title: {
@@ -27,6 +29,10 @@ module.exports = (sequelize, Sequelize) => {
     },
     publishedDate: {
       type: Sequelize.DATE,
+    },
+    binding: {
+      type: DataTypes.ENUM('', 'paperback', 'hardcover'),
+      defaultValue: ''
     },
     createdAt: {
       type: Sequelize.DATE,

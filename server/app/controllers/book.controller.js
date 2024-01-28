@@ -24,6 +24,7 @@ exports.create = asyncHandler(async (req, res) => {
   await body("description").trim().run(req);
   await body("photo").trim().run(req);
   await body("pageCount").trim().run(req);
+  await body("binding").trim().run(req);
   await body("publisher").trim().run(req);
   await body("publishedDate")
     .trim()
@@ -47,6 +48,7 @@ exports.create = asyncHandler(async (req, res) => {
     description,
     photo,
     pageCount,
+    binding,
     publisher,
     publishedDate,
   } = req.body;
@@ -100,6 +102,7 @@ exports.create = asyncHandler(async (req, res) => {
       description,
       photo,
       pageCount,
+      binding,
       publisher,
       publishedDate,
     });
@@ -263,6 +266,7 @@ exports.update = asyncHandler(async (req, res) => {
   await body("description").trim().run(req);
   await body("photo").trim().run(req);
   await body("pageCount").trim().run(req);
+  await body("binding").trim().run(req);
   await body("publisher").trim().run(req);
   await body("publishedDate")
     .trim()
@@ -286,6 +290,7 @@ exports.update = asyncHandler(async (req, res) => {
     description,
     photo,
     pageCount,
+    binding,
     publisher,
     publishedDate,
   } = req.body;
@@ -387,6 +392,9 @@ exports.update = asyncHandler(async (req, res) => {
   }
   if (pageCount) {
     book.pageCount = pageCount;
+  }
+  if (binding) {
+    book.binding = binding;
   }
   if (publisher) {
     book.publisher = publisher;

@@ -380,6 +380,7 @@ export default function MediaQuickInfo(props) {
             open={props.fullInfoOpen ? props.fullInfoOpen : false}
             closeModal={closeFullInfo}
             mediaInfo={props.mediaInfo}
+            mediaInstance={props.mediaInstance}
             mediaTypeId={props.mediaTypeId}
             setMediaInfo={props.setMediaInfo}
             userStatus={props.userStatus}
@@ -387,6 +388,7 @@ export default function MediaQuickInfo(props) {
             coverUrl={props.coverUrl}
             setCoverUrl={props.setCoverUrl}
             deleteMediaInstance={props.deleteMediaInstance}
+            updateMediaInstance={props.updateMediaInstance}
           />
         ) : null}
       </Box>
