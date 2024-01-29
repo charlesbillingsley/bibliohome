@@ -1,7 +1,6 @@
 import React, { useEffect, useState } from "react";
 import Grid from "@mui/material/Grid";
 import {
-  useTheme,
   useMediaQuery,
   createTheme,
   ThemeProvider,
@@ -17,8 +16,8 @@ const drawerClosedTheme = createTheme({
     values: {
       xxs: 300,
       xs: 360,
-      sm: 600,
-      md: 800,
+      sm: 650,
+      md: 950,
       lg: 1100,
       xl: 1920,
     },
@@ -32,7 +31,7 @@ const drawerOpenTheme = createTheme({
       xxs: 240,
       xs: 700,
       sm: 900,
-      md: 1100,
+      md: 1200,
       lg: 1280,
       xl: 1920,
     },
@@ -47,32 +46,41 @@ function MediaInstanceCard(props) {
   const [contextMenuPosition, setContextMenuPosition] = useState(null);
   const [fullInfoOpen, setFullInfoOpen] = useState(false);
 
-  const theme = useTheme();
+  const theme = props.drawerOpen ? drawerOpenTheme : drawerClosedTheme;
   const isXxs = useMediaQuery(theme.breakpoints.down("xxs"));
 
+  const gridPoints = {
+    xxs: props.drawerOpen ? 12 : 12,
+    xs: props.drawerOpen ? 3 : 4,
+    sm: props.drawerOpen ? 3 : 3,
+    md: props.drawerOpen ? 2 : 2,
+    lg: props.drawerOpen ? 2 : 2,
+    xl: props.drawerOpen ? 2 : 2,
+  };
+
   // UNCOMMENT THIS TO DEBUG SCREEN SIZE LOGIC
-  // const belowXxs = useMediaQuery(theme.breakpoints.down("xxs"));
-  // const xxsToxs = useMediaQuery(theme.breakpoints.between("xxs", "xs"));
-  // const xsToSm = useMediaQuery(theme.breakpoints.between("xs", "sm"));
-  // const smToMd = useMediaQuery(theme.breakpoints.between("sm", "md"));
-  // const mdToLg = useMediaQuery(theme.breakpoints.between("md", "lg"));
-  // const lgToXl = useMediaQuery(theme.breakpoints.between("lg", "xl"));
-  // const aboveXl = useMediaQuery(theme.breakpoints.up("xl"));
-  // if (belowXxs) {
-  //   console.log("smaller than xxs");
-  // } else if (xxsToxs) {
-  //   console.log("xxs to xs");
-  // } else if (xsToSm) {
-  //   console.log("xs to sm");
-  // } else if (smToMd) {
-  //   console.log("sm to md");
-  // } else if (mdToLg) {
-  //   console.log("md to lg");
-  // } else if (lgToXl) {
-  //   console.log("lg to xl");
-  // } else if (aboveXl) {
-  //   console.log("larger than xl");
-  // }
+  const belowXxs = useMediaQuery(theme.breakpoints.down("xxs"));
+  const xxsToxs = useMediaQuery(theme.breakpoints.between("xxs", "xs"));
+  const xsToSm = useMediaQuery(theme.breakpoints.between("xs", "sm"));
+  const smToMd = useMediaQuery(theme.breakpoints.between("sm", "md"));
+  const mdToLg = useMediaQuery(theme.breakpoints.between("md", "lg"));
+  const lgToXl = useMediaQuery(theme.breakpoints.between("lg", "xl"));
+  const aboveXl = useMediaQuery(theme.breakpoints.up("xl"));
+  if (belowXxs) {
+    console.log("smaller than xxs");
+  } else if (xxsToxs) {
+    console.log("xxs to xs");
+  } else if (xsToSm) {
+    console.log("xs to sm");
+  } else if (smToMd) {
+    console.log("sm to md");
+  } else if (mdToLg) {
+    console.log("md to lg");
+  } else if (lgToXl) {
+    console.log("lg to xl");
+  } else if (aboveXl) {
+    console.log("larger than xl");
+  }
 
   const handleContextMenu = (event) => {
     if (!fullInfoOpen && mediaInfo.mediaTypeId == 1) {
@@ -122,15 +130,25 @@ function MediaInstanceCard(props) {
     <ThemeProvider
       theme={props.drawerOpen ? drawerOpenTheme : drawerClosedTheme}
     >
-      <Grid item xs={isXxs ? 12 : 3} sm={3} md={2} lg={2} xl={2}>
+      <Grid
+        item
+        xs={isXxs ? gridPoints["xxs"] : gridPoints["xs"]}
+        sm={gridPoints["sm"]}
+        md={gridPoints['md']}
+        lg={gridPoints['lg']}
+        xl={gridPoints['xl']}
+      >
         <div
           onMouseDown={(e) => setPressEvent(e)}
           onMouseUp={() => setPressEvent()}
+          onTouchStart={(e) => setPressEvent(e)}
+          onTouchEnd={() => setPressEvent()}
         >
           <MediaQuickInfo
             productCode={props.mediaInstance.Book?.isbn13 || null}
             mediaTitle={
-              props.mediaInstance.Book?.title || props.mediaInstance.Movie?.title
+              props.mediaInstance.Book?.title ||
+              props.mediaInstance.Movie?.title
             }
             mediaYear={props.mediaInstance.Movie?.releaseDate || null}
             mediaTypeId={props.mediaTypeId}

@@ -174,7 +174,7 @@ function CardGrid(props) {
 
       setMediaInstanceCards(cards);
     }
-  }, [mediaInstances]);
+  }, [mediaInstances, props.drawerOpen]);
 
   useEffect(() => {
     if (newMediaInstance) {
