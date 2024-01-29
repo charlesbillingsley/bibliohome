@@ -1,7 +1,14 @@
 import React, { useEffect, useState } from "react";
 import Typography from "@mui/material/Typography";
 import axios from "axios";
-import { Card, CardMedia, CardContent, Box, Tooltip, useMediaQuery } from "@mui/material";
+import {
+  Card,
+  CardMedia,
+  CardContent,
+  Box,
+  Tooltip,
+  useMediaQuery,
+} from "@mui/material";
 import MediaFullInfo from "./MediaFullInfo";
 import { useTheme } from "@emotion/react";
 
@@ -130,58 +137,62 @@ export default function MediaQuickInfo(props) {
       props.mediaAuthorFirstName &&
       props.mediaAuthorLastName
     ) {
-      googleApiUrl += "title:" + props.mediaTitle + 
-      "&author:" + props.mediaAuthorFirstName + 
-      "%20" + props.mediaAuthorLastName;
+      googleApiUrl +=
+        "title:" +
+        props.mediaTitle +
+        "&author:" +
+        props.mediaAuthorFirstName +
+        "%20" +
+        props.mediaAuthorLastName;
       urlFilled = true;
     }
 
     if (urlFilled) {
       console.log("Fetching book from Google API");
-        axios
-          .get(googleApiUrl)
-          .then(function (response) {
-            if (response.data.totalItems === 0) {
-              props.setMediaNotFound(true);
-            } else {
-              // Get matching book
-              let match = response.data.items[0]
+      axios
+        .get(googleApiUrl)
+        .then(function (response) {
+          if (response.data.totalItems === 0) {
+            props.setMediaNotFound(true);
+          } else {
+            // Get matching book
+            let match = response.data.items[0];
 
-              if (props.productCode) {
-                for (var i of response.data.items) {
-                  for (var j of i.volumeInfo.industryIdentifiers) {
-                    if (j.identifier == props.productCode) {
-                      match = i;
-                    }
+            if (props.productCode) {
+              for (var i of response.data.items) {
+                for (var j of i.volumeInfo.industryIdentifiers) {
+                  if (j.identifier == props.productCode) {
+                    match = i;
                   }
                 }
               }
-
-              axios
-                .get(match.selfLink) // Call a GET command on the selfLink URL
-                .then(function (selfLinkResponse) {
-                  var foundMediaInfo = selfLinkResponse.data.volumeInfo;
-                  props.setMediaInfo(foundMediaInfo);
-                  props.setMediaNotFound(false);
-
-                  var foundCoverUrl = "";
-                  if (foundMediaInfo && foundMediaInfo.imageLinks) {
-                    foundCoverUrl = foundMediaInfo.imageLinks.smallThumbnail;
-                    foundCoverUrl = foundCoverUrl.replace("&edge=curl", "");
-                  }
-
-                  props.setCoverUrl(foundCoverUrl);
-                  props.setUserStatus("unread");
-                })
-                .catch(function (selfLinkError) {
-                  console.log(selfLinkError.message);
-                });
             }
-          })
-          .catch(function (error) {
-            console.log(error.message);
-          });
-      }
+
+            axios
+              .get(match.selfLink) // Call a GET command on the selfLink URL
+              .then(function (selfLinkResponse) {
+                var foundMediaInfo = selfLinkResponse.data.volumeInfo;
+                props.setMediaInfo(foundMediaInfo);
+                props.setMediaNotFound(false);
+
+                var foundCoverUrl = "";
+                if (foundMediaInfo && foundMediaInfo.imageLinks) {
+                  foundCoverUrl = foundMediaInfo.imageLinks.smallThumbnail;
+                  foundCoverUrl = foundCoverUrl.replace("&edge=curl", "");
+                }
+
+                props.setCoverUrl(foundCoverUrl);
+                props.setUserStatus("unread");
+              })
+              .catch(function (selfLinkError) {
+                console.log(selfLinkError.message);
+              });
+          }
+        })
+        .catch(function (error) {
+          console.log(error.message);
+        });
+    }
   };
 
   // Function to fetch a movie from External API
@@ -229,7 +240,7 @@ export default function MediaQuickInfo(props) {
                     budget: foundMediaInfo.budget,
                     revenue: foundMediaInfo.revenue,
                     genres: foundMediaInfo.genres,
-                    productionCompanies: foundMediaInfo.production_companies
+                    productionCompanies: foundMediaInfo.production_companies,
                   });
                   props.setMediaNotFound(false);
 
@@ -386,20 +397,26 @@ export default function MediaQuickInfo(props) {
           </Typography>
         </CardContent>
         {props.mediaInfo ? (
-          <MediaFullInfo
-            open={props.fullInfoOpen ? props.fullInfoOpen : false}
-            closeModal={closeFullInfo}
-            mediaInfo={props.mediaInfo}
-            mediaInstance={props.mediaInstance}
-            mediaTypeId={props.mediaTypeId}
-            setMediaInfo={props.setMediaInfo}
-            userStatus={props.userStatus}
-            updateUserStatus={props.updateUserStatus}
-            coverUrl={props.coverUrl}
-            setCoverUrl={props.setCoverUrl}
-            deleteMediaInstance={props.deleteMediaInstance}
-            updateMediaInstance={props.updateMediaInstance}
-          />
+          <div
+            onContextMenu={(e) => {
+              e.stopPropagation();
+            }}
+          >
+            <MediaFullInfo
+              open={props.fullInfoOpen ? props.fullInfoOpen : false}
+              closeModal={closeFullInfo}
+              mediaInfo={props.mediaInfo}
+              mediaInstance={props.mediaInstance}
+              mediaTypeId={props.mediaTypeId}
+              setMediaInfo={props.setMediaInfo}
+              userStatus={props.userStatus}
+              updateUserStatus={props.updateUserStatus}
+              coverUrl={props.coverUrl}
+              setCoverUrl={props.setCoverUrl}
+              deleteMediaInstance={props.deleteMediaInstance}
+              updateMediaInstance={props.updateMediaInstance}
+            />
+          </div>
         ) : null}
       </Box>
     </Card>
