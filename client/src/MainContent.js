@@ -18,7 +18,6 @@ import Modal from "@mui/material/Modal";
 import { IconButton, Typography, useMediaQuery } from "@mui/material";
 import EditLibrary from "./EditLibrary.js";
 import axios from "axios";
-import { useTheme } from "@emotion/react";
 
 const customGreenBase = "#00dcff";
 const customGreenMain = alpha(customGreenBase, 0.7);

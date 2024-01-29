@@ -9,6 +9,7 @@ import {
 } from "@mui/material";
 import MediaQuickInfo from "./MediaQuickInfo";
 import axios from "axios";
+import { useLongPress } from "use-long-press";
 
 // Drawer closed
 const drawerClosedTheme = createTheme({
@@ -42,7 +43,6 @@ function MediaInstanceCard(props) {
   const [mediaInfo, setMediaInfo] = useState({});
   const [userStatus, setUserStatus] = useState("");
   const [coverUrl, setCoverUrl] = useState("");
-  const [pressEvent, setPressEvent] = useState(false);
   const [contextMenuPosition, setContextMenuPosition] = useState(null);
   const [fullInfoOpen, setFullInfoOpen] = useState(false);
 
@@ -58,29 +58,29 @@ function MediaInstanceCard(props) {
     xl: props.drawerOpen ? 2 : 2,
   };
 
-  // UNCOMMENT THIS TO DEBUG SCREEN SIZE LOGIC
-  const belowXxs = useMediaQuery(theme.breakpoints.down("xxs"));
-  const xxsToxs = useMediaQuery(theme.breakpoints.between("xxs", "xs"));
-  const xsToSm = useMediaQuery(theme.breakpoints.between("xs", "sm"));
-  const smToMd = useMediaQuery(theme.breakpoints.between("sm", "md"));
-  const mdToLg = useMediaQuery(theme.breakpoints.between("md", "lg"));
-  const lgToXl = useMediaQuery(theme.breakpoints.between("lg", "xl"));
-  const aboveXl = useMediaQuery(theme.breakpoints.up("xl"));
-  if (belowXxs) {
-    console.log("smaller than xxs");
-  } else if (xxsToxs) {
-    console.log("xxs to xs");
-  } else if (xsToSm) {
-    console.log("xs to sm");
-  } else if (smToMd) {
-    console.log("sm to md");
-  } else if (mdToLg) {
-    console.log("md to lg");
-  } else if (lgToXl) {
-    console.log("lg to xl");
-  } else if (aboveXl) {
-    console.log("larger than xl");
-  }
+  // // UNCOMMENT THIS TO DEBUG SCREEN SIZE LOGIC
+  // const belowXxs = useMediaQuery(theme.breakpoints.down("xxs"));
+  // const xxsToxs = useMediaQuery(theme.breakpoints.between("xxs", "xs"));
+  // const xsToSm = useMediaQuery(theme.breakpoints.between("xs", "sm"));
+  // const smToMd = useMediaQuery(theme.breakpoints.between("sm", "md"));
+  // const mdToLg = useMediaQuery(theme.breakpoints.between("md", "lg"));
+  // const lgToXl = useMediaQuery(theme.breakpoints.between("lg", "xl"));
+  // const aboveXl = useMediaQuery(theme.breakpoints.up("xl"));
+  // if (belowXxs) {
+  //   console.log("smaller than xxs");
+  // } else if (xxsToxs) {
+  //   console.log("xxs to xs");
+  // } else if (xsToSm) {
+  //   console.log("xs to sm");
+  // } else if (smToMd) {
+  //   console.log("sm to md");
+  // } else if (mdToLg) {
+  //   console.log("md to lg");
+  // } else if (lgToXl) {
+  //   console.log("lg to xl");
+  // } else if (aboveXl) {
+  //   console.log("larger than xl");
+  // }
 
   const handleContextMenu = (event) => {
     if (!fullInfoOpen && mediaInfo.mediaTypeId == 1) {
@@ -94,6 +94,10 @@ function MediaInstanceCard(props) {
   const handleCloseContextMenu = () => {
     setContextMenuPosition(null);
   };
+
+  const bind = useLongPress((e) => {
+    handleContextMenu(e);
+  });
 
   const deleteMediaInstance = () => {
     props.deleteMediaInstance(props.mediaInstance);
@@ -116,16 +120,6 @@ function MediaInstanceCard(props) {
     handleCloseContextMenu();
   };
 
-  //handleLongPress
-  useEffect(() => {
-    const timer = pressEvent
-      ? setTimeout(() => {
-          handleContextMenu(pressEvent);
-        }, 600)
-      : null;
-    return () => clearTimeout(timer);
-  }, [pressEvent]);
-
   return (
     <ThemeProvider
       theme={props.drawerOpen ? drawerOpenTheme : drawerClosedTheme}
@@ -134,15 +128,15 @@ function MediaInstanceCard(props) {
         item
         xs={isXxs ? gridPoints["xxs"] : gridPoints["xs"]}
         sm={gridPoints["sm"]}
-        md={gridPoints['md']}
-        lg={gridPoints['lg']}
-        xl={gridPoints['xl']}
+        md={gridPoints["md"]}
+        lg={gridPoints["lg"]}
+        xl={gridPoints["xl"]}
       >
         <div
-          onMouseDown={(e) => setPressEvent(e)}
-          onMouseUp={() => setPressEvent()}
-          onTouchStart={(e) => setPressEvent(e)}
-          onTouchEnd={() => setPressEvent()}
+          onContextMenu={(e) => {
+            e.preventDefault();
+          }}
+          {...bind()}
         >
           <MediaQuickInfo
             productCode={props.mediaInstance.Book?.isbn13 || null}
