@@ -392,7 +392,9 @@ export default function MediaFullInfo(props) {
                     ) : null}
                     {props.mediaInfo.binding && (
                       <Typography variant="body" sx={{ marginLeft: "10px" }}>
-                        Binding: {props.mediaInfo.binding}
+                        Binding:{" "}
+                        {props.mediaInfo.binding.charAt(0).toUpperCase() +
+                          props.mediaInfo.binding.slice(1)}
                       </Typography>
                     )}
                   </Box>
