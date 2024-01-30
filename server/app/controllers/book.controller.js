@@ -375,51 +375,33 @@ exports.update = asyncHandler(async (req, res) => {
   // Update the book's properties
   if (title) {
     book.title = title;
-  } else {
-    book.title = '';
   }
   if (isbn10) {
     book.isbn10 = isbn10;
-  } else {
-    book.isbn10 = '';
   }
   if (isbn13) {
     book.isbn13 = isbn13;
-  } else {
-    book.isbn13 = '';
   }
   if (subtitle) {
     book.subtitle = subtitle;
-  } else {
-    book.subtitle = '';
   }
   if (description) {
     book.description = description;
-  } else {
-    book.description = '';
   }
   if (photo) {
     book.photo = photo;
   }
   if (pageCount) {
     book.pageCount = pageCount;
-  } else {
-    book.pageCount = 0;
   }
   if (binding) {
     book.binding = binding;
-  } else {
-    book.binding = null;
   }
   if (publisher) {
     book.publisher = publisher;
-  } else {
-    book.publisher = '';
   }
   if (publishedDate) {
     book.publishedDate = publishedDate;
-  } else {
-    book.publishedDate = null;
   }
 
   await book.save();
@@ -431,10 +413,9 @@ exports.update = asyncHandler(async (req, res) => {
     } else {
       await book.setAuthors([]);
     }
-  } else {
-    await book.setAuthors([]);
+
+    book.setDataValue("authors", await book.getAuthors());
   }
-  book.setDataValue("authors", await book.getAuthors());
 
   if (genres) {
     if (collectedGenres.length > 0) {
@@ -442,10 +423,9 @@ exports.update = asyncHandler(async (req, res) => {
     } else {
       await book.setBookGenres([]);
     }
-  } else {
-    await book.setBookGenres([]);
+
+    book.setDataValue("bookGenres", await book.getBookGenres());
   }
-  book.setDataValue("bookGenres", await book.getBookGenres());
 
   res.json(book);
 });
