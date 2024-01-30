@@ -400,8 +400,6 @@ exports.update = asyncHandler(async (req, res) => {
   }
   if (photo) {
     book.photo = photo;
-  } else {
-    book.photo = '';
   }
   if (pageCount) {
     book.pageCount = pageCount;
