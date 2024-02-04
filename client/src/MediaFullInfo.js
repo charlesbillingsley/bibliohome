@@ -24,6 +24,10 @@ import {
 import UploadImage from "./UploadImage";
 import EditBook from "./EditBook";
 import EditMovie from "./EditMovie";
+import { DatePicker } from "@mui/x-date-pickers";
+import dayjs from "dayjs";
+import utc from "dayjs/plugin/utc";
+dayjs.extend(utc);
 
 const style = {
   display: "flex",
@@ -140,6 +144,10 @@ export default function MediaFullInfo(props) {
 
   const handleStatusChange = (event) => {
     props.updateUserStatus(event.target.value);
+  };
+
+  const handleDateReadChange = (event) => {
+    props.updateDateRead(dayjs(event).format("YYYY-MM-DD"));
   };
 
   const openRemoveConfirmation = () => {
@@ -304,6 +312,18 @@ export default function MediaFullInfo(props) {
                         Abandoned
                       </MenuItem>
                     </Select>
+                  </FormControl>
+                </Grid>
+              )}
+              {props.userStatus && (
+                <Grid item>
+                  <FormControl fullWidth>
+                    <DatePicker
+                      label="Date Read"
+                      sx={{ marginTop: "10px" }}
+                      value={dayjs(props.dateRead).utc()}
+                      onChange={handleDateReadChange}
+                    />
                   </FormControl>
                 </Grid>
               )}

@@ -21,6 +21,9 @@ module.exports = app => {
     // Update a Book with id
     router.post("/:id/updateStatus", books.updateStatus);
 
+    // Update a Book with id
+    router.post("/:id/updateDateRead", books.updateDateRead);
+
     // Delete a Book with id
     router.post("/:id/delete", books.delete);
 

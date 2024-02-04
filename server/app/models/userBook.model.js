@@ -7,6 +7,10 @@ module.exports = (sequelize, Sequelize) => {
         type: DataTypes.ENUM('unread', 'reading', 'read', 'abandoned'),
         defaultValue: 'unread'
       },
+      dateRead: {
+        type: Sequelize.DATE,
+        allowNull: true,
+      }
     });
   
     return UserBook;

@@ -79,6 +79,7 @@ export default function MediaQuickInfo(props) {
           var imagePath = "/image/book/" + foundMediaInfo.photo;
           props.setCoverUrl(axios.defaults.baseURL + imagePath);
           props.setUserStatus(getUserStatus(foundMediaInfo));
+          props.setDateRead(getDateRead(foundMediaInfo))
         } else {
           props.setMediaInfo(null);
           props.setCoverUrl("/noImage.jpg");
@@ -298,6 +299,24 @@ export default function MediaQuickInfo(props) {
 
     return userStatus;
   };
+  
+  const getDateRead = (mediaInfo) => {
+    let dateRead = null;
+
+    if (mediaInfo && mediaInfo.users) {
+      const users = mediaInfo.users;
+
+      for (const user of users) {
+        if (user.id === props.user.id) {
+          dateRead = user.userStatus.dateRead;
+          console.log(dateRead)
+          break;
+        }
+      }
+    }
+
+    return dateRead;
+  };
 
   useEffect(() => {
     if (props.mediaExists) {
@@ -411,6 +430,8 @@ export default function MediaQuickInfo(props) {
               setMediaInfo={props.setMediaInfo}
               userStatus={props.userStatus}
               updateUserStatus={props.updateUserStatus}
+              dateRead={props.dateRead}
+              updateDateRead={props.updateDateRead}
               coverUrl={props.coverUrl}
               setCoverUrl={props.setCoverUrl}
               deleteMediaInstance={props.deleteMediaInstance}

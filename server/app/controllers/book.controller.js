@@ -1,3 +1,4 @@
+const dayjs = require("dayjs");
 const { body, validationResult } = require("express-validator");
 const asyncHandler = require("express-async-handler");
 const db = require("../models");
@@ -153,7 +154,7 @@ exports.search = asyncHandler(async (req, res) => {
             as: "users",
             through: {
               model: UserBook,
-              attributes: ["status"],
+              attributes: ["status", "dateRead"],
               as: 'userStatus'
             },
           },
@@ -171,7 +172,7 @@ exports.search = asyncHandler(async (req, res) => {
             as: "users",
             through: {
               model: UserBook,
-              attributes: ["status"],
+              attributes: ["status", "dateRead"],
               as: 'userStatus'
             },
           },
@@ -189,7 +190,7 @@ exports.search = asyncHandler(async (req, res) => {
             as: "users",
             through: {
               model: UserBook,
-              attributes: ["status"],
+              attributes: ["status", "dateRead"],
               as: 'userStatus'
             },
           },
@@ -440,14 +441,55 @@ exports.updateStatus = asyncHandler(async (req, res) => {
 
   if (!userBook) {
     // Create a new UserBook entry if it doesn't exist
+    let dateRead = null;
+    if (status=='read') {
+      dateRead = dayjs().format("YYYY-MM-DD")
+    }
+
     userBook = await UserBook.create({
       bookId,
       userId,
       status,
+      dateRead,
     });
   } else {
     // Update the status of the existing UserBook entry
     userBook.status = status;
+    if (status == "read" && !userBook.dateRead) {
+      userBook.dateRead = dayjs().format("YYYY-MM-DD");
+    }
+    await userBook.save();
+  }
+
+  res.json(userBook);
+});
+
+// Update the date read of a book
+exports.updateDateRead = asyncHandler(async (req, res) => {
+  const { bookId, userId, dateRead } = req.body;
+
+  await body("dateRead")
+    .trim()
+    .isISO8601()
+    .withMessage("Invalid 'date read' value. Must be in ISO 8601 format.")
+    .run(req);
+
+  let userBook = await UserBook.findOne({
+    where: { bookId, userId },
+  });
+
+  if (!userBook) {
+    // Create a new UserBook entry if it doesn't exist
+    userBook = await UserBook.create({
+      bookId,
+      userId,
+      status: "read",
+      dateRead,
+    });
+  } else {
+    // Update the existing UserBook entry
+    userBook.dateRead = dateRead;
+
     await userBook.save();
   }
 

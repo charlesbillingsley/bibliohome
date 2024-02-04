@@ -42,6 +42,7 @@ const drawerOpenTheme = createTheme({
 function MediaInstanceCard(props) {
   const [mediaInfo, setMediaInfo] = useState({});
   const [userStatus, setUserStatus] = useState("");
+  const [dateRead, setDateRead] = useState(null);
   const [coverUrl, setCoverUrl] = useState("");
   const [contextMenuPosition, setContextMenuPosition] = useState(null);
   const [fullInfoOpen, setFullInfoOpen] = useState(false);
@@ -108,10 +109,30 @@ function MediaInstanceCard(props) {
       .post("/book/" + props.mediaInstance.Book.id + "/updateStatus", {
         bookId: props.mediaInstance.Book.id,
         userId: props.user.id,
-        status: status,
+        status: status
       })
       .then((response) => {
         setUserStatus(status);
+      })
+      .catch((error) => {
+        console.log(error);
+      });
+
+    handleCloseContextMenu();
+  };
+
+  const updateDateRead = (dateRead) => {
+    if (dateRead == "Invalid Date") {
+      dateRead = null;
+    }
+    axios
+      .post("/book/" + props.mediaInstance.Book.id + "/updateDateRead", {
+        bookId: props.mediaInstance.Book.id,
+        userId: props.user.id,
+        dateRead: dateRead,
+      })
+      .then((response) => {
+        setDateRead(dateRead);
       })
       .catch((error) => {
         console.log(error);
@@ -159,6 +180,9 @@ function MediaInstanceCard(props) {
             userStatus={userStatus}
             setUserStatus={setUserStatus}
             updateUserStatus={updateUserStatus}
+            dateRead={dateRead}
+            setDateRead={setDateRead}
+            updateDateRead={updateDateRead}
             fullInfoOpen={fullInfoOpen}
             setFullInfoOpen={setFullInfoOpen}
           />

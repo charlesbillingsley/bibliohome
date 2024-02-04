@@ -17,9 +17,12 @@ import {
   FormLabel,
 } from "@mui/material";
 import EditUser from "./EditUser";
-import dayjs from "dayjs";
 import UploadImage from "./UploadImage";
 import axios from "axios";
+import dayjs from "dayjs";
+import utc from "dayjs/plugin/utc";
+dayjs.extend(utc);
+
 
 const style = {
   display: "flex",
@@ -264,7 +267,7 @@ export default function UserInfo(props) {
                     <Box>
                       <Typography variant="body">
                         {props.user.dateOfBirth
-                          ? dayjs(props.user.dateOfBirth).format("MM-DD-YYYY")
+                          ? dayjs(props.user.dateOfBirth).utc().format("MM-DD-YYYY")
                           : ""}
                       </Typography>
                     </Box>
