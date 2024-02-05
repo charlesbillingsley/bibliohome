@@ -4,10 +4,12 @@ const db = require("../models");
 const Movie = db.movies;
 const ProductionCompany = db.productionCompanies;
 const Genre = db.genres;
+const Series = db.series;
 const User = db.users;
 const MovieInstance = db.movieInstances;
 const Library = db.libraries;
 const UserMovie = db.userMoives;
+const BookSeries = db.bookSeries;
 
 // Create and save a new movie
 exports.create = asyncHandler(async (req, res) => {
@@ -28,6 +30,7 @@ exports.create = asyncHandler(async (req, res) => {
   await body("photo").trim().run(req);
   await body("genres.*").run(req);
   await body("productionCompanies.*").run(req);
+  await body("series.*").run(req);
 
   const errors = validationResult(req);
   if (!errors.isEmpty()) {
@@ -46,6 +49,7 @@ exports.create = asyncHandler(async (req, res) => {
     photo,
     genres,
     productionCompanies,
+    series,
   } = req.body;
 
   // Check if the associated genres exist
@@ -96,6 +100,33 @@ exports.create = asyncHandler(async (req, res) => {
     }
   }
 
+  // Check if the associated series exist
+  var collectedSeries = [];
+  for (const seriesInfo of series) {
+    const name = seriesInfo.name;
+
+    try {
+      // Search for an existing series based on name
+      let newSeries = await Series.findOne({
+        where: { name },
+      });
+
+      if (!newSeries) {
+        // If series doesn't exist, create a new one with name
+        newSeries = await Series.create({
+          name,
+        });
+      }
+
+      collectedSeries.push(newSeries);
+    } catch (error) {
+      console.error("Error occurred while creating/finding series:", error);
+      return res.status(500).json({
+        error: "An error occurred while creating/finding series.",
+      });
+    }
+  }
+
   // Create a new movie instance
   const movie = await Movie.create({
     title,
@@ -118,6 +149,9 @@ exports.create = asyncHandler(async (req, res) => {
   }
   if (collectedGenres.length > 0) {
     await movie.setMovieGenres(collectedGenres.map((genre) => genre.id));
+  }
+  if (collectedSeries.length > 0) {
+    await movie.setSeries(collectedSeries.map((seriesItem) => seriesItem.id));
   }
 
   await movie.setMediaType(2);
@@ -150,6 +184,7 @@ exports.search = asyncHandler(async (req, res) => {
         include: [
           { model: ProductionCompany, as: "productionCompanies" },
           { model: Genre, as: "movieGenres" },
+          { model: Series, as: "series" },
         ],
       });
     } else if (title && releaseDate) {
@@ -157,10 +192,11 @@ exports.search = asyncHandler(async (req, res) => {
       const isoReleaseDate = new Date(releaseDate).toISOString();
 
       movie = await Movie.findOne({
-        where: { title, releaseDate:isoReleaseDate },
+        where: { title, releaseDate: isoReleaseDate },
         include: [
           { model: ProductionCompany, as: "productionCompanies" },
           { model: Genre, as: "movieGenres" },
+          { model: Series, as: "series" },
         ],
       });
     } else {
@@ -207,7 +243,13 @@ exports.search = asyncHandler(async (req, res) => {
 exports.findOne = asyncHandler(async (req, res) => {
   const { id } = req.params;
 
-  const movie = await Movie.findByPk(id, { include: Genre });
+  const movie = await Movie.findByPk(id, {
+    include: [
+      { model: Genre, as: "movieGenres" },
+      { model: ProductionCompany, as: "productionCompanies" },
+      { model: Series, as: "series" },
+    ],
+  });
 
   if (!movie) {
     return res.status(404).json({ error: "Movie not found" });
@@ -232,6 +274,7 @@ exports.update = asyncHandler(async (req, res) => {
   await body("photo").trim().run(req);
   await body("genres.*").run(req);
   await body("productionCompanies.*").run(req);
+  await body("series.*").run(req);
 
   const errors = validationResult(req);
   if (!errors.isEmpty()) {
@@ -250,6 +293,7 @@ exports.update = asyncHandler(async (req, res) => {
     photo,
     genres,
     productionCompanies,
+    series,
   } = req.body;
 
   const movie = await Movie.findByPk(id);
@@ -323,6 +367,39 @@ exports.update = asyncHandler(async (req, res) => {
     }
   }
 
+  // Check if the associated series exist
+  var collectedSeries = [];
+  if (series) {
+    for (const seriesItem of series) {
+      let seriesData = seriesItem;
+
+      if (typeof seriesItem == "string") {
+        let name = "";
+        let id = -1;
+
+        seriesData = { id, name };
+      }
+
+      let newSeries = null;
+      let seriesCreated = false;
+      if (seriesData.id >= 0) {
+        newSeries = await Series.findByPk(seriesData.id);
+      } else {
+        search = {
+          name: seriesData.name,
+        };
+
+        [newSeries, seriesCreated] = await Series.findOrCreate({
+          where: search,
+        });
+      }
+
+      if (newSeries) {
+        collectedSeries.push(newSeries);
+      }
+    }
+  }
+
   // Update the movie's properties
   if (title) {
     movie.title = title;
@@ -379,6 +456,16 @@ exports.update = asyncHandler(async (req, res) => {
     }
 
     movie.setDataValue("movieGenres", await movie.getMovieGenres());
+  }
+
+  if (series) {
+    if (collectedSeries.length > 0) {
+      await movie.setSeries(collectedSeries.map((newSeries) => newSeries.id));
+    } else {
+      await movie.setSeries([]);
+    }
+
+    movie.setDataValue("series", await movie.getSeries());
   }
 
   res.json(movie);

@@ -40,6 +40,9 @@ db.productionCompanies = require("./productionCompany.model.js")(
 );
 db.users = require("./user.model.js")(sequelize, Sequelize);
 db.userBooks = require("./userBook.model.js")(sequelize, Sequelize);
+db.series = require("./series.model.js")(sequelize, Sequelize);
+db.bookSeries = require("./bookSeries.model.js")(sequelize, Sequelize);
+db.movieSeries = require("./movieSeries.model.js")(sequelize, Sequelize);
 
 // Set up associations
 // --- MediaType
@@ -55,6 +58,9 @@ db.mediaTypes.hasMany(db.bookInstances, {
 db.mediaTypes.hasMany(db.movieInstances, {
   foreignKey: "mediaTypeId",
 });
+db.mediaTypes.hasMany(db.series, {
+  foreignKey: "mediaTypeId",
+});
 
 
 // --- Book
@@ -67,6 +73,12 @@ db.books.belongsToMany(db.genres, {
   through: "bookGenre",
   foreignKey: "bookId",
   as: "bookGenres",
+});
+db.books.belongsToMany(db.series, {
+  through: db.bookSeries,
+  foreignKey: "bookId",
+  otherKey: "seriesId",
+  as: "series",
 });
 db.books.belongsTo(db.mediaTypes, {
   foreignKey: "mediaTypeId",
@@ -89,6 +101,12 @@ db.movies.belongsToMany(db.genres, {
   through: "movieGenre",
   foreignKey: "movieId",
   as: "movieGenres",
+});
+db.movies.belongsToMany(db.series, {
+  through: db.movieSeries,
+  foreignKey: "movieId",
+  otherKey: "seriesId",
+  as: "series",
 });
 db.movies.belongsTo(db.mediaTypes, {
   foreignKey: "mediaTypeId",
@@ -145,6 +163,20 @@ db.genres.belongsToMany(db.movies, {
   foreignKey: "genreId",
   as: "movies",
 });
+
+// --- Series
+db.series.belongsToMany(db.books, {
+  through: db.bookSeries,
+  foreignKey: "seriesId",
+  otherKey: "bookId",
+  as: "books",
+})
+db.series.belongsToMany(db.movies, {
+  through: db.movieSeries,
+  foreignKey: "seriesId",
+  otherKey: "movieId",
+  as: "movies",
+})
 
 // --- Production Company
 db.productionCompanies.belongsToMany(db.movies, {

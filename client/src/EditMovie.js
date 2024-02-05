@@ -8,6 +8,7 @@ import { Button, FormLabel, TextField } from "@mui/material";
 import { DatePicker } from "@mui/x-date-pickers/DatePicker";
 import ProductionCompanyInput from "./ProductionCompanyInput";
 import GenreInput from "./GenreInput";
+import SeriesInput from "./SeriesInput";
 
 export default function EditMovie(props) {
   const [title, setTitle] = useState(props.mediaInfo.title);
@@ -23,10 +24,15 @@ export default function EditMovie(props) {
   const [productionCompanies, setProductionCompanies] = useState(
     props.mediaInfo.productionCompanies
   );
+  const [series, setSeries] = useState(props.mediaInfo.series);
   const [genres, setGenres] = useState(props.mediaInfo.movieGenres);
 
   const handleProductionCompaniesChange = (updatedProductionCompanies) => {
     setProductionCompanies(updatedProductionCompanies);
+  };
+
+  const handleSeriesChange = (updatedSeries) => {
+    setSeries(updatedSeries);
   };
 
   const handleGenresChange = (updatedGenres) => {
@@ -46,11 +52,12 @@ export default function EditMovie(props) {
         runtime,
         budget,
         revenue,
+        series,
         genres,
       };
       const updateMovieResponse = await axios.post(apiUrl, payload);
       if (updateMovieResponse.data.id) {
-        console.log(updateMovieResponse.data)
+        console.log(updateMovieResponse.data);
         props.setMediaInfo(updateMovieResponse.data);
         props.closeModal();
       }
@@ -164,6 +171,7 @@ export default function EditMovie(props) {
         onChange={(e) => setRevenue(e.target.value)}
       />
 
+      <SeriesInput initialSeries={series} onSeriesChange={handleSeriesChange} />
       <GenreInput initialGenres={genres} onGenresChange={handleGenresChange} />
 
       <Box

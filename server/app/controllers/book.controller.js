@@ -5,10 +5,12 @@ const db = require("../models");
 const Book = db.books;
 const Author = db.authors;
 const Genre = db.genres;
+const Series = db.series;
 const User = db.users;
 const BookInstance = db.bookInstances;
 const Library = db.libraries;
 const UserBook = db.userBooks;
+const BookSeries = db.bookSeries;
 
 // Create and save a new book
 exports.create = asyncHandler(async (req, res) => {
@@ -26,6 +28,8 @@ exports.create = asyncHandler(async (req, res) => {
   await body("photo").trim().run(req);
   await body("pageCount").trim().run(req);
   await body("binding").trim().run(req);
+  await body("series.*").run(req);
+  await body("orderNumber").trim().run(req);
   await body("publisher").trim().run(req);
   await body("publishedDate")
     .trim()
@@ -50,6 +54,8 @@ exports.create = asyncHandler(async (req, res) => {
     photo,
     pageCount,
     binding,
+    series,
+    orderNumber,
     publisher,
     publishedDate,
   } = req.body;
@@ -93,6 +99,16 @@ exports.create = asyncHandler(async (req, res) => {
     collectedGenres.push(genre);
   }
 
+  // check in the associated series exist
+  var collectedSeries = [];
+  for (const seriesName of series) {
+    const [newSeries, seriesCreated] = await Series.findOrCreate({
+      where: { name: seriesName },
+    });
+
+    collectedSeries.push(newSeries);
+  }
+
   let book;
   try {
     // Create a new book instance
@@ -119,6 +135,19 @@ exports.create = asyncHandler(async (req, res) => {
   if (collectedGenres.length > 0) {
     await book.setBookGenres(collectedGenres.map((genre) => genre.id));
   }
+  if (collectedSeries.length > 0) {
+    // Add orderNumber to the association
+    await Promise.all(
+      collectedSeries.map(async (newSeries, index) => {
+        const orderNum = orderNumber ? orderNumber : null;
+        await BookSeries.create({
+          bookId: book.id,
+          seriesId: newSeries.id,
+          orderNumber: orderNum,
+        });
+      })
+    );
+  }
 
   await book.setMediaType(1);
 
@@ -131,6 +160,7 @@ exports.findAll = asyncHandler(async (req, res) => {
     include: [
       { model: Author, as: "authors" },
       { model: Genre, as: "bookGenres" },
+      { model: Series, as: "series" },
     ],
   });
   res.json(books);
@@ -148,6 +178,7 @@ exports.search = asyncHandler(async (req, res) => {
         include: [
           { model: Author, as: "authors" },
           { model: Genre, as: "bookGenres" },
+          { model: Series, as: "series" },
           {
             model: User,
             attributes: ["id"],
@@ -155,7 +186,7 @@ exports.search = asyncHandler(async (req, res) => {
             through: {
               model: UserBook,
               attributes: ["status", "dateRead"],
-              as: 'userStatus'
+              as: "userStatus",
             },
           },
         ],
@@ -166,6 +197,7 @@ exports.search = asyncHandler(async (req, res) => {
         include: [
           { model: Author, as: "authors" },
           { model: Genre, as: "bookGenres" },
+          { model: Series, as: "series" },
           {
             model: User,
             attributes: ["id"],
@@ -173,7 +205,7 @@ exports.search = asyncHandler(async (req, res) => {
             through: {
               model: UserBook,
               attributes: ["status", "dateRead"],
-              as: 'userStatus'
+              as: "userStatus",
             },
           },
         ],
@@ -184,6 +216,7 @@ exports.search = asyncHandler(async (req, res) => {
         include: [
           { model: Author, as: "authors" },
           { model: Genre, as: "bookGenres" },
+          { model: Series, as: "series" },
           {
             model: User,
             attributes: ["id"],
@@ -191,7 +224,7 @@ exports.search = asyncHandler(async (req, res) => {
             through: {
               model: UserBook,
               attributes: ["status", "dateRead"],
-              as: 'userStatus'
+              as: "userStatus",
             },
           },
         ],
@@ -240,12 +273,19 @@ exports.search = asyncHandler(async (req, res) => {
 exports.findOne = asyncHandler(async (req, res) => {
   const { id } = req.params;
 
-  const book = await Book.findByPk(id, {
-    include: [
-      { model: Author, as: "authors" },
-      { model: Genre, as: "bookGenres" },
-    ],
-  });
+  let book;
+  try {
+    book = await Book.findByPk(id, {
+      include: [
+        { model: Author, as: "authors" },
+        { model: Genre, as: "bookGenres" },
+        { model: Series, as: "series" },
+      ],
+    });
+  } catch (e) {
+    console.error(e);
+    throw e;
+  }
 
   if (!book) {
     return res.status(404).json({ error: "Book not found" });
@@ -269,6 +309,8 @@ exports.update = asyncHandler(async (req, res) => {
   await body("photo").trim().run(req);
   await body("pageCount").trim().run(req);
   await body("binding").trim().run(req);
+  await body("series.*").run(req);
+  await body("orderNumber").trim().run(req);
   await body("publisher").trim().run(req);
   await body("publishedDate")
     .trim()
@@ -293,6 +335,8 @@ exports.update = asyncHandler(async (req, res) => {
     photo,
     pageCount,
     binding,
+    series,
+    orderNumber,
     publisher,
     publishedDate,
   } = req.body;
@@ -301,6 +345,7 @@ exports.update = asyncHandler(async (req, res) => {
     include: [
       { model: Author, as: "authors" },
       { model: Genre, as: "bookGenres" },
+      { model: Series, as: "series" },
     ],
   });
 
@@ -373,6 +418,30 @@ exports.update = asyncHandler(async (req, res) => {
     }
   }
 
+  // Check if the associated series exist
+  var collectedSeries = [];
+  if (series) {
+    for (const seriesItem of series) {
+      let seriesData = seriesItem;
+
+      let newSeries = null;
+      let seriesCreated = false;
+      if (seriesData.id >= 0) {
+        newSeries = await Series.findByPk(seriesData.id);
+      } else {
+        [newSeries, seriesCreated] = await Series.findOrCreate({
+          where: {
+            name: seriesData.name,
+          },
+        });
+      }
+
+      if (newSeries) {
+        collectedSeries.push(newSeries);
+      }
+    }
+  }
+
   // Update the book's properties
   if (title) {
     book.title = title;
@@ -407,7 +476,7 @@ exports.update = asyncHandler(async (req, res) => {
 
   await book.save();
 
-  // Set the authors and genres for the book
+  // Set the authors and genres and series for the book
   if (authors) {
     if (collectedAuthors.length > 0) {
       await book.setAuthors(collectedAuthors.map((author) => author.id));
@@ -428,7 +497,61 @@ exports.update = asyncHandler(async (req, res) => {
     book.setDataValue("bookGenres", await book.getBookGenres());
   }
 
-  res.json(book);
+  if (series) {
+    if (collectedSeries.length > 0) {
+      // Update existing associations and add new ones
+      await Promise.all(
+        collectedSeries.map(async (newSeries, index) => {
+          let bookSeries = await BookSeries.findOne({
+            where: { bookId: book.id, seriesId: newSeries.id },
+          });
+
+          if (!bookSeries) {
+            // Create a new bookSeries entry if it doesn't exist
+            bookSeries = await BookSeries.create({
+              bookId: book.id,
+              seriesId: newSeries.id,
+              orderNumber,
+            });
+          } else {
+            // Update the orderNumber of the existing bookSeries entry
+            bookSeries.orderNumber = orderNumber;
+            await bookSeries.save();
+          }
+        })
+      );
+
+      // // Remove associations not in the updated list
+      // const updatedSeriesIds = collectedSeries.map((newSeries) => newSeries.id);
+      // const existingSeriesIds = book.series.map(
+      //   (existingSeries) => existingSeries.id
+      // );
+      // const removedSeriesIds = existingSeriesIds.filter(
+      //   (id) => !updatedSeriesIds.includes(id)
+      // );
+
+      // await BookSeries.destroy({
+      //   where: {
+      //     bookId: book.id,
+      //     seriesId: removedSeriesIds,
+      //   },
+      // });
+    } else {
+      await book.setSeries([]);
+    }
+
+    book.setDataValue("series", await book.getSeries());
+  }
+
+  let updated_book = await Book.findByPk(book.id, {
+    include: [
+      { model: Author, as: "authors" },
+      { model: Genre, as: "bookGenres" },
+      { model: Series, as: "series" },
+    ],
+  });
+
+  res.json(updated_book);
 });
 
 // Update the user status of a book
@@ -442,8 +565,8 @@ exports.updateStatus = asyncHandler(async (req, res) => {
   if (!userBook) {
     // Create a new UserBook entry if it doesn't exist
     let dateRead = null;
-    if (status=='read') {
-      dateRead = dayjs().format("YYYY-MM-DD")
+    if (status == "read") {
+      dateRead = dayjs().format("YYYY-MM-DD");
     }
 
     userBook = await UserBook.create({

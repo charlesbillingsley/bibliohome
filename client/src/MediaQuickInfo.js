@@ -79,7 +79,7 @@ export default function MediaQuickInfo(props) {
           var imagePath = "/image/book/" + foundMediaInfo.photo;
           props.setCoverUrl(axios.defaults.baseURL + imagePath);
           props.setUserStatus(getUserStatus(foundMediaInfo));
-          props.setDateRead(getDateRead(foundMediaInfo))
+          props.setDateRead(getDateRead(foundMediaInfo));
         } else {
           props.setMediaInfo(null);
           props.setCoverUrl("/noImage.jpg");
@@ -299,7 +299,7 @@ export default function MediaQuickInfo(props) {
 
     return userStatus;
   };
-  
+
   const getDateRead = (mediaInfo) => {
     let dateRead = null;
 
@@ -309,7 +309,7 @@ export default function MediaQuickInfo(props) {
       for (const user of users) {
         if (user.id === props.user.id) {
           dateRead = user.userStatus.dateRead;
-          console.log(dateRead)
+          console.log(dateRead);
           break;
         }
       }

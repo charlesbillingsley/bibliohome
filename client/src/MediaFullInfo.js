@@ -500,11 +500,53 @@ export default function MediaFullInfo(props) {
                       },
                     }}
                   >
+                    <Typography variant="subtitle1" fontWeight={"bold"}>
+                      Genres:
+                    </Typography>
                     <List>
                       {props.mediaInfo[genrePropertyName].map((genre) => {
                         return (
                           <ListItemText key={genre.id}>
                             <Typography>{genre.path}</Typography>
+                          </ListItemText>
+                        );
+                      })}
+                    </List>
+                  </Box>
+                </Grid>
+              ) : null}
+              {props.mediaInfo.series && props.mediaInfo.series.length ? (
+                <Grid item>
+                  <Box
+                    sx={{
+                      border: "1px solid lightgrey",
+                      borderRadius: "10px",
+                      paddingLeft: "8px",
+                      maxHeight: 100,
+                      overflow: "auto",
+                      "&::-webkit-scrollbar": {
+                        width: "8px",
+                        borderRadius: "4px",
+                      },
+                      "&::-webkit-scrollbar-thumb": {
+                        backgroundColor: "#888",
+                        borderRadius: "4px",
+                      },
+                      "&::-webkit-scrollbar-thumb:hover": {
+                        backgroundColor: "#555",
+                      },
+                    }}
+                  >
+                    <Typography variant="subtitle1" fontWeight={"bold"}>
+                      Series:
+                    </Typography>
+                    <List>
+                      {props.mediaInfo.series.map((series) => {
+                        return (
+                          <ListItemText key={series.id}>
+                            <Typography>
+                              {series.name} (Book: {series.BookSeries.orderNumber})
+                            </Typography>
                           </ListItemText>
                         );
                       })}

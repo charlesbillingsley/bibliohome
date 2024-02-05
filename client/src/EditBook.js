@@ -8,6 +8,7 @@ import { Button, FormLabel, MenuItem, TextField } from "@mui/material";
 import { DatePicker } from "@mui/x-date-pickers/DatePicker";
 import AuthorInput from "./AuthorInput";
 import GenreInput from "./GenreInput";
+import SeriesInput from "./SeriesInput";
 
 export default function EditBook(props) {
   const [title, setTitle] = useState(props.mediaInfo.title);
@@ -26,6 +27,10 @@ export default function EditBook(props) {
   );
   const [authors, setAuthors] = useState(props.mediaInfo.authors);
   const [genres, setGenres] = useState(props.mediaInfo.bookGenres);
+  const [series, setSeries] = useState(props.mediaInfo.series);
+  const [orderNumber, setOrderNumber] = useState(
+    props.mediaInfo.series[0].BookSeries.orderNumber
+  );
 
   const handleAuthorsChange = (updatedAuthors) => {
     setAuthors(updatedAuthors);
@@ -33,6 +38,10 @@ export default function EditBook(props) {
 
   const handleGenresChange = (updatedGenres) => {
     setGenres(updatedGenres);
+  };
+
+  const handleSeriesChange = (updatedSeries) => {
+    setSeries(updatedSeries);
   };
 
   const submit = async () => {
@@ -48,6 +57,8 @@ export default function EditBook(props) {
         description,
         pageCount,
         binding,
+        series,
+        orderNumber,
         publisher,
         publishedDate: dayjs(publishedDate).format("YYYY-MM-DD"),
       };
@@ -58,13 +69,13 @@ export default function EditBook(props) {
 
       let instanceUrl = "/bookInstance/" + props.mediaInstance.id + "/update";
       const saveBookInstanceResponse = await axios.post(instanceUrl, {
-        numberOfCopies: numberOfCopies
+        numberOfCopies: numberOfCopies,
       });
 
       if (saveBookInstanceResponse.data.id) {
         props.updateMediaInstance(saveBookInstanceResponse.data);
       }
-      
+
       if (updateBookResponse.data.id && saveBookInstanceResponse.data.id) {
         props.closeModal();
       }
@@ -192,6 +203,16 @@ export default function EditBook(props) {
         type="number"
         value={numberOfCopies}
         onChange={(e) => setNumberOfCopies(e.target.value)}
+      />
+
+      <SeriesInput initialSeries={series} onSeriesChange={handleSeriesChange} />
+
+      <TextField
+        label="Number in Series"
+        sx={{ marginTop: "10px" }}
+        type="number"
+        value={orderNumber}
+        onChange={(e) => setOrderNumber(e.target.value)}
       />
 
       <GenreInput initialGenres={genres} onGenresChange={handleGenresChange} />
