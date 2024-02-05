@@ -29,7 +29,7 @@ export default function EditBook(props) {
   const [genres, setGenres] = useState(props.mediaInfo.bookGenres);
   const [series, setSeries] = useState(props.mediaInfo.series);
   const [orderNumber, setOrderNumber] = useState(
-    props.mediaInfo.series[0].BookSeries.orderNumber
+    props.mediaInfo.series[0]?.BookSeries.orderNumber
   );
 
   const handleAuthorsChange = (updatedAuthors) => {
