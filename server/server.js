@@ -77,6 +77,7 @@ require("./app/routes/movieInstance.routes")(app);
 require("./app/routes/user.routes")(app);
 require("./app/routes/image.routes")(app);
 require("./app/routes/productionCompany.routes")(app);
+require("./app/routes/series.routes")(app);
 
 // set port, listen for requests
 const PORT = process.env.PORT || 3001;
