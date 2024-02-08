@@ -141,6 +141,7 @@ export default function NewMedia(props) {
           publishedDate: mediaInfo.publishedDate,
           genres: mediaInfo.categories ? mediaInfo.categories : [],
           authors: mediaInfo.authors ? mediaInfo.authors : [],
+          series: [],
           photo: photoPath,
         });
 
