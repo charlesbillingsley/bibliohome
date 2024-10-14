@@ -135,7 +135,7 @@ export default function MediaQuickInfo(props) {
           let bookApiKey = response.data.bookApiKey;
           if (!bookApiKey) {
             props.setMediaNotFound(true);
-
+          } else {
             var googleApiUrl = (
               "https://www.googleapis.com/books/v1/volumes?key=" + bookApiKey
               + "&q="
