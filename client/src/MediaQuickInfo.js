@@ -127,163 +127,92 @@ export default function MediaQuickInfo(props) {
 
   // Function to fetch a book from External API
   const _fetchBookFromExternalAPI = () => {
-    var googleApiUrl = "https://www.googleapis.com/books/v1/volumes?q=";
-    var urlFilled = false;
-
-    if (props.productCode) {
-      googleApiUrl += "isbn:" + props.productCode;
-      urlFilled = true;
-    } else if (
-      props.mediaTitle &&
-      props.mediaAuthorFirstName &&
-      props.mediaAuthorLastName
-    ) {
-      googleApiUrl +=
-        "title:" +
-        props.mediaTitle +
-        "&author:" +
-        props.mediaAuthorFirstName +
-        "%20" +
-        props.mediaAuthorLastName;
-      urlFilled = true;
-    }
-
-    if (urlFilled) {
-      console.log("Fetching book from Google API");
-      axios
-        .get(googleApiUrl)
-        .then(function (response) {
-          if (response.data.totalItems === 0) {
+    // Get api keys
+    axios
+      .get("/appSettings/1")
+      .then(function (response) {
+        if (response.data) {
+          let bookApiKey = response.data.bookApiKey;
+          if (!bookApiKey) {
             props.setMediaNotFound(true);
-          } else {
-            // Get matching book
-            let match = response.data.items[0];
+
+            var googleApiUrl = (
+              "https://www.googleapis.com/books/v1/volumes?key=" + bookApiKey
+              + "&q="
+            );
+            var urlFilled = false;
 
             if (props.productCode) {
-              for (var i of response.data.items) {
-                for (var j of i.volumeInfo.industryIdentifiers) {
-                  if (j.identifier == props.productCode) {
-                    match = i;
-                  }
-                }
-              }
+              googleApiUrl += "isbn:" + props.productCode;
+              urlFilled = true;
+            } else if (
+              props.mediaTitle &&
+              props.mediaAuthorFirstName &&
+              props.mediaAuthorLastName
+            ) {
+              googleApiUrl +=
+                "title:" +
+                props.mediaTitle +
+                "&author:" +
+                props.mediaAuthorFirstName +
+                "%20" +
+                props.mediaAuthorLastName;
+              urlFilled = true;
             }
 
-            axios
-              .get(match.selfLink) // Call a GET command on the selfLink URL
-              .then(function (selfLinkResponse) {
-                var foundMediaInfo = selfLinkResponse.data.volumeInfo;
-                props.setMediaInfo(foundMediaInfo);
-                props.setMediaNotFound(false);
+            if (urlFilled) {
+              console.log("Fetching book from Google API");
+              axios
+                .get(googleApiUrl)
+                .then(function (response) {
+                  if (response.data.totalItems === 0) {
+                    props.setMediaNotFound(true);
+                  } else {
+                    // Get matching book
+                    let match = response.data.items[0];
 
-                var foundCoverUrl = "";
-                if (foundMediaInfo && foundMediaInfo.imageLinks) {
-                  foundCoverUrl = foundMediaInfo.imageLinks.smallThumbnail;
-                  foundCoverUrl = foundCoverUrl.replace("&edge=curl", "");
-                }
-
-                props.setCoverUrl(foundCoverUrl);
-                props.setUserStatus("unread");
-              })
-              .catch(function (selfLinkError) {
-                console.log(selfLinkError.message);
-              });
-          }
-        })
-        .catch(function (error) {
-          console.log(error.message);
-        });
-    }
-  };
-
-    // Function to fetch a movie from External API
-    const _fetchBookFromExternalAPI = () => {
-      // Get api keys
-      axios
-        .get("/appSettings/1")
-        .then(function (response) {
-          if (response.data) {
-            let bookApiKey = response.data.bookApiKey;
-            if (!bookApiKey) {
-              props.setMediaNotFound(true);
-
-              var googleApiUrl = (
-                "https://www.googleapis.com/books/v1/volumes?key=" + bookApiKey
-                + "&q="
-              );
-              var urlFilled = false;
-
-              if (props.productCode) {
-                googleApiUrl += "isbn:" + props.productCode;
-                urlFilled = true;
-              } else if (
-                props.mediaTitle &&
-                props.mediaAuthorFirstName &&
-                props.mediaAuthorLastName
-              ) {
-                googleApiUrl +=
-                  "title:" +
-                  props.mediaTitle +
-                  "&author:" +
-                  props.mediaAuthorFirstName +
-                  "%20" +
-                  props.mediaAuthorLastName;
-                urlFilled = true;
-              }
-
-              if (urlFilled) {
-                console.log("Fetching book from Google API");
-                axios
-                  .get(googleApiUrl)
-                  .then(function (response) {
-                    if (response.data.totalItems === 0) {
-                      props.setMediaNotFound(true);
-                    } else {
-                      // Get matching book
-                      let match = response.data.items[0];
-
-                      if (props.productCode) {
-                        for (var i of response.data.items) {
-                          for (var j of i.volumeInfo.industryIdentifiers) {
-                            if (j.identifier == props.productCode) {
-                              match = i;
-                            }
+                    if (props.productCode) {
+                      for (var i of response.data.items) {
+                        for (var j of i.volumeInfo.industryIdentifiers) {
+                          if (j.identifier == props.productCode) {
+                            match = i;
                           }
                         }
                       }
-
-                      axios
-                        .get(match.selfLink) // Call a GET command on the selfLink URL
-                        .then(function (selfLinkResponse) {
-                          var foundMediaInfo = selfLinkResponse.data.volumeInfo;
-                          props.setMediaInfo(foundMediaInfo);
-                          props.setMediaNotFound(false);
-
-                          var foundCoverUrl = "";
-                          if (foundMediaInfo && foundMediaInfo.imageLinks) {
-                            foundCoverUrl = foundMediaInfo.imageLinks.smallThumbnail;
-                            foundCoverUrl = foundCoverUrl.replace("&edge=curl", "");
-                          }
-
-                          props.setCoverUrl(foundCoverUrl);
-                          props.setUserStatus("unread");
-                        })
-                        .catch(function (selfLinkError) {
-                          console.log(selfLinkError.message);
-                        });
                     }
-                  })
-                  .catch(function (error) {
-                    console.log(error.message);
-                  });
-              }
+
+                    axios
+                      .get(match.selfLink) // Call a GET command on the selfLink URL
+                      .then(function (selfLinkResponse) {
+                        var foundMediaInfo = selfLinkResponse.data.volumeInfo;
+                        props.setMediaInfo(foundMediaInfo);
+                        props.setMediaNotFound(false);
+
+                        var foundCoverUrl = "";
+                        if (foundMediaInfo && foundMediaInfo.imageLinks) {
+                          foundCoverUrl = foundMediaInfo.imageLinks.smallThumbnail;
+                          foundCoverUrl = foundCoverUrl.replace("&edge=curl", "");
+                        }
+
+                        props.setCoverUrl(foundCoverUrl);
+                        props.setUserStatus("unread");
+                      })
+                      .catch(function (selfLinkError) {
+                        console.log(selfLinkError.message);
+                      });
+                  }
+                })
+                .catch(function (error) {
+                  console.log(error.message);
+                });
             }
           }
-        })
-        .catch(function (error) {
-          console.error(error);
-        });
-    };
+        }
+      })
+      .catch(function (error) {
+        console.error(error);
+      });
+  };
   
 
   // Function to fetch a movie from External API
