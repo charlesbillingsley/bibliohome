@@ -182,7 +182,7 @@ export default function MediaQuickInfo(props) {
                     }
 
                     axios
-                      .get(match.selfLink+"&key=" + bookApiKey) // Call a GET command on the selfLink URL
+                      .get(match.selfLink+"?key=" + bookApiKey) // Call a GET command on the selfLink URL
                       .then(function (selfLinkResponse) {
                         var foundMediaInfo = selfLinkResponse.data.volumeInfo;
                         props.setMediaInfo(foundMediaInfo);
