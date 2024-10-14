@@ -25,6 +25,7 @@ async function seedDatabase() {
         emailUsername: "",
         emailPassKey: "",
         movieApiKey: "",
+        bookApiKey: "",
       });
       console.log("App Settings seeded successfully.");
     }

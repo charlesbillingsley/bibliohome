@@ -10,6 +10,7 @@ export default function AppSettings(props) {
   const [emailUsername, setEmailUsername] = useState();
   const [emailPassKey, setEmailPassKey] = useState();
   const [movieApiKey, setMovieApiKey] = useState();
+  const [bookApiKey, setBookApiKey] = useState();
 
   const submit = async () => {
     try {
@@ -18,7 +19,8 @@ export default function AppSettings(props) {
         emailService,
         emailUsername,
         emailPassKey,
-        movieApiKey
+        movieApiKey,
+        bookApiKey
       };
       const updateSettingsResponse = await axios.post(apiUrl, payload);
       if (updateSettingsResponse.data.id) {
@@ -39,6 +41,7 @@ export default function AppSettings(props) {
           setEmailUsername(response.data.emailUsername || '');
           setEmailPassKey(response.data.emailPassKey || '');
           setMovieApiKey(response.data.movieApiKey || '');
+          setBookApiKey(response.data.bookApiKey || '');
         }
       })
       .catch(function (error) {
@@ -99,6 +102,26 @@ export default function AppSettings(props) {
           label="API Key"
           value={movieApiKey}
           onChange={(e) => setMovieApiKey(e.target.value)}
+        />
+      </Box>
+      <Typography variant="h6" marginTop="10px">
+        Google Books API
+      </Typography>
+      <Box
+        sx={{
+          border: "1px solid lightgrey",
+          borderRadius: "10px",
+          padding: "10px",
+          display: "flex",
+          flexDirection: "column",
+          gap: "10px",
+        }}
+      >
+        <Link href="https://developers.google.com/books/docs/v1/using">Google Books API Link</Link>
+        <TextField
+          label="API Key"
+          value={bookApiKey}
+          onChange={(e) => setBookApiKey(e.target.value)}
         />
       </Box>
       <Box

@@ -10,6 +10,7 @@ exports.create = asyncHandler(async (req, res) => {
   await body("emailUsername").trim().run(req);
   await body("emailPassKey").trim().run(req);
   await body("movieApiKey").trim().run(req);
+  await body("bookApiKey").trim().run(req);
 
   const errors = validationResult(req);
   if (!errors.isEmpty()) {
@@ -20,7 +21,8 @@ exports.create = asyncHandler(async (req, res) => {
     emailService,
     emailUsername,
     emailPassKey,
-    movieApiKey
+    movieApiKey,
+    bookApiKey
   } = req.body;
 
   // Create a new appSettings instance
@@ -29,6 +31,7 @@ exports.create = asyncHandler(async (req, res) => {
     emailUsername,
     emailPassKey,
     movieApiKey,
+    bookApiKey,
   });
 
   res.status(201).json(appSettings);
@@ -56,6 +59,7 @@ exports.update = asyncHandler(async (req, res) => {
   await body("emailUsername").trim().run(req);
   await body("emailPassKey").trim().run(req);
   await body("movieApiKey").trim().run(req);
+  await body("bookApiKey").trim().run(req);
 
   const errors = validationResult(req);
   if (!errors.isEmpty()) {
@@ -66,7 +70,8 @@ exports.update = asyncHandler(async (req, res) => {
     emailService,
     emailUsername,
     emailPassKey,
-    movieApiKey
+    movieApiKey,
+    bookApiKey
   } = req.body;
 
   const appSettings = await AppSettings.findByPk(id);
@@ -87,6 +92,9 @@ exports.update = asyncHandler(async (req, res) => {
   }
   if (movieApiKey) {
     appSettings.movieApiKey = movieApiKey;
+  }
+  if (bookApiKey) {
+    appSettings.bookApiKey = bookApiKey;
   }
 
   await appSettings.save();

@@ -12,6 +12,9 @@ module.exports = (sequelize, Sequelize) => {
     movieApiKey: {
       type: Sequelize.STRING,
     },
+    bookApiKey: {
+      type: Sequelize.STRING,
+    },
   });
 
   // Virtual for user's URL
