@@ -6,7 +6,19 @@ const Sequelize = require('sequelize');
 const process = require('process');
 const basename = path.basename(__filename);
 const env = process.env.NODE_ENV || 'development';
-const config = require(__dirname + '/../config/config.json')[env];
+const configFile = require(__dirname + '/../config/config.json')[env];
+
+// Build config from environment variables with fallbacks to config file
+const config = {
+  username: process.env.DB_USER || configFile.username,
+  password: process.env.DB_PASSWORD || configFile.password,
+  database: process.env.DB_NAME || configFile.database,
+  host: process.env.DB_HOST || configFile.host,
+  port: process.env.DB_PORT || configFile.port || undefined,
+  dialect: configFile.dialect || 'mysql',
+  pool: configFile.pool || undefined,
+  define: configFile.define || undefined,
+};
 const db = {};
 
 let sequelize;

@@ -1,14 +1,8 @@
-FROM node:alpine AS installer
+FROM node:18-alpine
 WORKDIR /usr/src/app
 
-COPY package*.json .
-
+COPY package*.json ./
 RUN npm install
-
-FROM node:alpine as release
-WORKDIR /usr/src/app
-
-COPY --from=installer /usr/src/app /usr/src/app
 
 COPY . .
 

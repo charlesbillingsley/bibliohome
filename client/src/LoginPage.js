@@ -58,27 +58,32 @@ export default function LoginPage(props) {
     e.preventDefault();
     setErrors([]);
 
-    let response = await axios
-      .post("/user/login", {
-        username,
-        password,
-      })
-      .catch(function (error) {
+      let response;
+      try {
+        response = await axios.post("/user/login", { username, password });
+      } catch (error) {
         console.error(error);
-        let errorMessages = [
-          <Typography color="error">{error.message}</Typography>,
-        ];
-        if (error.response.data.errors) {
-          errorMessages = error.response.data.errors.map((err) => (
-            <Typography color="error">{err.msg}</Typography>
-          ));
-        } else if (error.response.data.error) {
-          let errorMessage = error.response.data.error;
-          setErrors([<Typography color="error">{errorMessage}</Typography>]);
+        // Build a safe error display from available fields.
+        if (error.response && error.response.data) {
+          const data = error.response.data;
+          if (data.errors && Array.isArray(data.errors)) {
+            setErrors(
+              data.errors.map((err, idx) => (
+                <Typography key={idx} color="error">{err.msg || JSON.stringify(err)}</Typography>
+              ))
+            );
+          } else if (data.error) {
+            setErrors([<Typography color="error">{data.error}</Typography>]);
+          } else {
+            setErrors([<Typography color="error">{JSON.stringify(data)}</Typography>]);
+          }
+        } else {
+          // Network or other error (no response)
+          setErrors([<Typography color="error">{error.message}</Typography>]);
         }
-      });
+      }
 
-    if (response.data) {
+      if (response && response.data) {
       // Reset form fields
       setUsername("");
       setPassword("");

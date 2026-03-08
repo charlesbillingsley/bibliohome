@@ -1,13 +1,16 @@
-FROM node:alpine
+FROM node:18-alpine
 WORKDIR /usr/src/app
 
 ENV NODE_ENV=production
 
-COPY package*.json /usr/src/app
-RUN npm ci
+# copy package files and install dependencies
+COPY package*.json ./
+RUN npm install --production
 
-COPY . /usr/src/app
+# copy source
+COPY . .
 
 EXPOSE 3001
 
-CMD ["npm", "start", "server.js"]
+# start the server
+CMD ["node", "server.js"]

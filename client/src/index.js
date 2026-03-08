@@ -8,7 +8,8 @@ import axios from 'axios';
 //axios.defaults.baseURL = process.env.REACT_APP_API_ENDPOINT;
 
 //prod
-axios.defaults.baseURL = window.location.href + '/api';
+axios.defaults.baseURL = window.location.origin + '/api';
+console.log("API Endpoint: " + axios.defaults.baseURL);
 
 const root = ReactDOM.createRoot(document.getElementById('root'));
 root.render(

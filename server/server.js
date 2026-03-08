@@ -8,9 +8,13 @@ const app = express();
 
 var corsOptions = {
   origin: [
-    "http://localhost:3000",
+    "http://localhost:3002",
+    "http://127.0.0.1:3002",
+    "http://192.168.86.60:3002",
+    "http://bibliohome.charmanda.casa:3002",
+    "http://bibliohome.charmanda.casa"
   ],
-  default: "http://localhost:3000"
+  default: "http://localhost:3002"
 };
 
 app.use(cors(corsOptions));
@@ -18,17 +22,32 @@ app.use(cors(corsOptions));
 // load the database
 const db = require("./app/models");
 
-// Sync the models and create the tables
-db.sequelize
-  .sync({ force: resetDb })
-  .then(() => {
-    console.log("Database sync successful.");
-    // Seed the database
-    seedDatabase();
-  })
-  .catch((error) => {
-    console.error("Error syncing the database:", error);
-  });
+// Wait for DB to be ready and then sync models
+async function waitForDbAndSync(retries = 10, delayMs = 3000) {
+  const sequelize = db.sequelize;
+  for (let i = 0; i < retries; i++) {
+    try {
+      await sequelize.authenticate();
+      console.log('Database connection established.');
+      if (resetDb) {
+        await sequelize.sync({ force: true });
+      } else {
+        // Use alter in development so model changes (like new columns) are applied
+        await sequelize.sync({ alter: true });
+      }
+      console.log('Database sync successful.');
+      // Seed the database
+      seedDatabase();
+      return;
+    } catch (err) {
+      console.log(`Database not ready yet (attempt ${i + 1}/${retries}). Retrying in ${delayMs}ms...`);
+      await new Promise((r) => setTimeout(r, delayMs));
+    }
+  }
+  console.error('Could not connect to the database after multiple attempts. Exiting.');
+}
+
+waitForDbAndSync();
 
 // Drop tables in a specific order
 // db.sequelize
@@ -80,7 +99,8 @@ require("./app/routes/productionCompany.routes")(app);
 require("./app/routes/series.routes")(app);
 
 // set port, listen for requests
-const PORT = process.env.PORT || 3001;
+// Prefer explicit PORT env; otherwise use SERVER_DOCKER_PORT (set by docker-compose) or 3001
+const PORT = process.env.PORT || process.env.SERVER_DOCKER_PORT || 3001;
 app.listen(PORT, () => {
   console.log(`Server is running on port ${PORT}.`);
 });
