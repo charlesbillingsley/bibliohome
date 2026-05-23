@@ -3,6 +3,10 @@ import Box from "@mui/material/Box";
 import Typography from "@mui/material/Typography";
 import Modal from "@mui/material/Modal";
 import Button from "@mui/material/Button";
+import Checkbox from "@mui/material/Checkbox";
+import FormControlLabel from "@mui/material/FormControlLabel";
+import TextField from "@mui/material/TextField";
+import MenuItem from "@mui/material/MenuItem";
 import axios from "axios";
 import { Step, StepLabel, Stepper } from "@mui/material";
 import MediaType from "./MediaType";
@@ -37,6 +41,9 @@ export default function NewMedia(props) {
   const [mediaExists, setMediaExists] = useState(false);
   const [mediaNotFound, setMediaNotFound] = useState(false);
   const [coverUrl, setCoverUrl] = useState("/noImage.jpg");
+  const [binding, setBinding] = useState("");
+  const [openEditAfterAdd, setOpenEditAfterAdd] = useState(false);
+  const [showEditBook, setShowEditBook] = useState(false);
 
   const handleNext = () => {
     if (activeStep === steps.length - 1) {
@@ -154,9 +161,17 @@ export default function NewMedia(props) {
         bookId: existingBook,
         status: "Maintenance",
         libraryIds: [props.selectedLibrary.id],
-        numberOfCopies: 1
+        numberOfCopies: 1,
+        binding: binding || undefined
       });
       props.setNewInstance(saveBookInstanceResponse.data);
+      // If user wants to open edit after add, show EditBook modal
+      if (openEditAfterAdd) {
+        setShowEditBook({
+          mediaInfo: { ...mediaInfo, binding: binding || undefined, id: existingBook },
+          mediaInstance: saveBookInstanceResponse.data
+        });
+      }
     } catch (error) {
       console.log("Failed to save book instance:", error);
       setMediaSaveError(error.message);
@@ -439,6 +454,32 @@ export default function NewMedia(props) {
               setCoverUrl={setCoverUrl}
               clickable={false}
             />
+            {/* Show binding selector for books only */}
+            {mediaType && mediaType.id === 1 && (
+              <TextField
+                sx={{ marginTop: "10px", width: "80%" }}
+                value={binding}
+                label="Binding"
+                select
+                onChange={(e) => setBinding(e.target.value)}
+              >
+                <MenuItem value={"paperback"}>Paperback</MenuItem>
+                <MenuItem value={"hardcover"}>Hardcover</MenuItem>
+              </TextField>
+            )}
+            {/* Checkbox to open edit after add */}
+            {mediaType && mediaType.id === 1 && (
+              <FormControlLabel
+                control={
+                  <Checkbox
+                    checked={openEditAfterAdd}
+                    onChange={(e) => setOpenEditAfterAdd(e.target.checked)}
+                  />
+                }
+                label="Open edit window after adding"
+                sx={{ marginTop: "10px" }}
+              />
+            )}
             {mediaExists ? (
               <div
                 style={{ color: "red", marginTop: "5px", textAlign: "center" }}
@@ -494,6 +535,26 @@ export default function NewMedia(props) {
               </Button>
             </Box>
           </React.Fragment>
+        )}
+        {/* Show EditBook modal if requested */}
+        {showEditBook && (
+          <Modal open={!!showEditBook} onClose={() => setShowEditBook(false)}>
+            <Box sx={{ ...style, width: 600, maxHeight: '90vh', overflowY: 'auto' }}>
+              {/* Lazy load to avoid circular import issues */}
+              {(() => {
+                const EditBook = require("./EditBook.js").default;
+                return (
+                  <EditBook
+                    mediaInfo={showEditBook.mediaInfo}
+                    mediaInstance={showEditBook.mediaInstance}
+                    setMediaInfo={() => {}}
+                    updateMediaInstance={() => {}}
+                    closeModal={() => setShowEditBook(false)}
+                  />
+                );
+              })()}
+            </Box>
+          </Modal>
         )}
       </Box>
     </Modal>
